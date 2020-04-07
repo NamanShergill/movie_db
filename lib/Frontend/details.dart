@@ -23,22 +23,21 @@ class _DetailsState extends State<Details> {
     final _media = MediaQuery.of(context).size;
     return SafeArea(
       top: true,
+      bottom: true,
       child: Material(
         child: StreamBuilder(
           stream: bloc.detailInfo,
           builder: (context, AsyncSnapshot<DetailModel> snapshot) {
             if (snapshot.hasData) {
-              return Scrollbar(
-                  child: Text(
-                snapshot.data.title,
-                style: TextStyle(fontSize: 50),
-              ));
+              return SpinKitCubeGrid(
+                color: Colors.grey,
+              );
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString());
             }
             return Center(
                 child: SpinKitCubeGrid(
-              color: Colors.white,
+              color: Colors.black,
             ));
           },
         ),

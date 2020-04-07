@@ -25,7 +25,7 @@ class _ListPageState extends State<ListPage> {
       top: true,
       child: Material(
         child: Container(
-          color: background,
+          color: Colors.grey.shade50,
           height: _media.height,
           width: _media.width,
           child: Column(
@@ -35,26 +35,26 @@ class _ListPageState extends State<ListPage> {
                 padding: const EdgeInsets.all(20.0),
                 child: Text(
                   'THE MOVIE DB',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w300),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w300),
                 ),
               ),
               Expanded(
-                child: StreamBuilder(
-                  stream: bloc.allMovies,
-                  builder: (context, AsyncSnapshot<MovieModel> snapshot) {
-                    if (snapshot.hasData) {
-                      return Scrollbar(child: buildList(snapshot));
-                    } else if (snapshot.hasError) {
-                      return Text(snapshot.error.toString());
-                    }
-                    return Center(
-                        child: SpinKitCubeGrid(
-                      color: Colors.white,
-                    ));
-                  },
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: StreamBuilder(
+                    stream: bloc.allMovies,
+                    builder: (context, AsyncSnapshot<MovieModel> snapshot) {
+                      if (snapshot.hasData) {
+                        return Scrollbar(child: buildList(snapshot));
+                      } else if (snapshot.hasError) {
+                        return Text(snapshot.error.toString());
+                      }
+                      return Center(
+                          child: SpinKitCubeGrid(
+                        color: Colors.black,
+                      ));
+                    },
+                  ),
                 ),
               ),
             ],
@@ -66,34 +66,39 @@ class _ListPageState extends State<ListPage> {
 
   Widget buildList(AsyncSnapshot<MovieModel> snapshot) {
     return Padding(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(0.0),
       child: GridView.builder(
           physics: BouncingScrollPhysics(),
           itemCount: snapshot.data.results.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, childAspectRatio: 3 / 4.7),
+              crossAxisCount: 2, childAspectRatio: 3 / 4.4),
           itemBuilder: (BuildContext context, int index) {
             return Container(
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10)),
               padding: EdgeInsets.only(left: 8, right: 8, bottom: 20),
               child: Card(
                 color: Colors.transparent,
-                elevation: 5,
+                elevation: 10,
                 child: Stack(
                   children: <Widget>[
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Expanded(
-                            child: FadeInImage.assetNetwork(
-                              placeholder: 'Loading',
-                              image:
-                                  'https://image.tmdb.org/t/p/w185${snapshot.data.results[index].poster_path}',
-                              fit: BoxFit.cover,
+                      child: Container(
+                        color: background,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Expanded(
+                              child: FadeInImage.assetNetwork(
+                                placeholder: 'Loading',
+                                image:
+                                    'https://image.tmdb.org/t/p/w185${snapshot.data.results[index].poster_path}',
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     Align(
@@ -119,7 +124,7 @@ class _ListPageState extends State<ListPage> {
                                   snapshot.data.results[index].title,
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                      fontWeight: FontWeight.w400,
                                       fontSize: 15),
                                   textAlign: TextAlign.center,
                                 ),
@@ -143,7 +148,7 @@ class _ListPageState extends State<ListPage> {
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                          borderRadius: BorderRadius.circular(5),
+                          borderRadius: BorderRadius.circular(10),
                           onTap: () {
                             Navigator.push(
                                 context,

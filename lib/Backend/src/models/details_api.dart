@@ -1,7 +1,7 @@
 class DetailModel {
   bool adult;
   String backdropPath;
-  BelongsToCollection belongsToCollection;
+  dynamic belongsToCollection;
   int budget;
   List<Genre> genres;
   String homepage;
@@ -56,8 +56,7 @@ class DetailModel {
   factory DetailModel.fromJson(Map<String, dynamic> json) => DetailModel(
         adult: json["adult"],
         backdropPath: json["backdrop_path"],
-        belongsToCollection:
-            BelongsToCollection.fromJson(json["belongs_to_collection"]),
+        belongsToCollection: json["belongs_to_collection"],
         budget: json["budget"],
         genres: List<Genre>.from(json["genres"].map((x) => Genre.fromJson(x))),
         homepage: json["homepage"],
@@ -90,7 +89,7 @@ class DetailModel {
   Map<String, dynamic> toJson() => {
         "adult": adult,
         "backdrop_path": backdropPath,
-        "belongs_to_collection": belongsToCollection.toJson(),
+        "belongs_to_collection": belongsToCollection,
         "budget": budget,
         "genres": List<dynamic>.from(genres.map((x) => x.toJson())),
         "homepage": homepage,
@@ -117,35 +116,6 @@ class DetailModel {
         "video": video,
         "vote_average": voteAverage,
         "vote_count": voteCount,
-      };
-}
-
-class BelongsToCollection {
-  int id;
-  String name;
-  String posterPath;
-  String backdropPath;
-
-  BelongsToCollection({
-    this.id,
-    this.name,
-    this.posterPath,
-    this.backdropPath,
-  });
-
-  factory BelongsToCollection.fromJson(Map<String, dynamic> json) =>
-      BelongsToCollection(
-        id: json["id"],
-        name: json["name"],
-        posterPath: json["poster_path"],
-        backdropPath: json["backdrop_path"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "poster_path": posterPath,
-        "backdrop_path": backdropPath,
       };
 }
 
