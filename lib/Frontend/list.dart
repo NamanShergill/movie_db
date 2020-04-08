@@ -18,6 +18,9 @@ class _ListPageState extends State<ListPage> {
     bloc.fetchAllMovies();
   }
 
+  double height = 0;
+  double iconSize = 0;
+
   @override
   Widget build(BuildContext context) {
     final _media = MediaQuery.of(context).size;
@@ -32,15 +35,92 @@ class _ListPageState extends State<ListPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  'THE MOVIE DB',
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w300),
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: IconButton(
+                          icon: Icon(Icons.menu),
+                          onPressed: () {},
+                        ),
+                      ),
+                    ),
+                    Text(
+                      'THE MOVIE DB',
+                      style:
+                          TextStyle(fontSize: 25, fontWeight: FontWeight.w300),
+                    ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            setState(() {
+                              height == 0 ? height = 45 : height = 0;
+                              iconSize == 0 ? iconSize = 15 : iconSize = 0;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              AnimatedContainer(
+                height: height,
+                duration: Duration(milliseconds: 350),
+                width: double.infinity,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.only(left: 20, right: 20, bottom: 10),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(15),
+                      onTap: () {},
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                          border: Border.all(
+                            width: 0.1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20),
+                              child: Text(
+                                'Search would be enabled soon',
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: Icon(
+                                Icons.search,
+                                color: Colors.grey,
+                                size: iconSize,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.only(left: 8, right: 8),
                   child: StreamBuilder(
                     stream: bloc.allMovies,
                     builder: (context, AsyncSnapshot<MovieModel> snapshot) {
