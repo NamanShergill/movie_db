@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -85,38 +87,48 @@ class _DetailsState extends State<Details> {
                         ),
                       ),
                       Container(
-                        height: _media.height / 2.4,
+                        constraints: BoxConstraints(minHeight: 300),
+                        height: _media.height / 3,
                         child: Stack(
                           children: <Widget>[
                             ClipPath(
                               clipper: CustomClipPath(),
                               child: Container(
-                                height: _media.height / 2.4,
+                                constraints: BoxConstraints(minHeight: 300),
+                                height: _media.height / 3,
                                 width: double.infinity,
                                 color: Colors.grey.shade200,
-                                child: Stack(
-                                  children: <Widget>[
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: FadeInImage.assetNetwork(
-                                            fadeOutDuration:
-                                                Duration(milliseconds: 3000),
-                                            placeholder: '',
-                                            image:
-                                                'https://image.tmdb.org/t/p/w185${snapshot.data.posterPath}',
-                                            fit: BoxFit.cover,
+                                child: Container(
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: FadeInImage.assetNetwork(
+                                              fadeOutDuration:
+                                                  Duration(milliseconds: 200),
+                                              placeholder: '',
+                                              image:
+                                                  'https://image.tmdb.org/t/p/w185${snapshot.data.backdropPath}',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Expanded(
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                              sigmaY: 2.5, sigmaX: 2.5),
+                                          child: Container(
+                                            color:
+                                                Colors.black54.withOpacity(0.1),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    Expanded(
-                                        child: Container(
-                                      color: Colors.black54,
-                                    )),
-                                  ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -240,75 +252,40 @@ class _DetailsState extends State<Details> {
                                 snapshot.data.title.toUpperCase(),
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
+                                    fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               Center(
                                 child: SmoothStarRating(
                                     allowHalfRating: true,
                                     starCount: 5,
                                     rating: rating,
-                                    size: 40.0,
+                                    size: 30,
                                     halfFilledIconData: Icons.blur_on,
                                     color: Colors.redAccent,
                                     borderColor: Colors.redAccent,
                                     spacing: 0.0),
                               ),
                               SizedBox(
-                                height: 10,
+                                height: 20,
                               ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: <Widget>[
-                                  Container(
-                                    width: 100,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text(
-                                          'Year',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                        Text(
-                                          snapshot.data.releaseDate.year
-                                              .toString(),
-                                          style: info,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text(
-                                          'Adult',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                        Text(
-                                          snapshot.data.adult
-                                              .toString()
-                                              .toUpperCase(),
-                                          style: info,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text(
-                                          'Runtime',
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                        Text(
-                                          snapshot.data.runtime.toString() +
-                                              ' Min',
-                                          style: info,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                  colorCard(
+                                      'Year',
+                                      snapshot.data.releaseDate.year.toString(),
+                                      context),
+                                  colorCard(
+                                      'Adult',
+                                      snapshot.data.adult
+                                          .toString()
+                                          .toUpperCase(),
+                                      context),
+                                  colorCard(
+                                      'Runtime',
+                                      snapshot.data.runtime.toString() + ' Min',
+                                      context),
                                 ],
                               ),
                               SizedBox(
@@ -326,12 +303,150 @@ class _DetailsState extends State<Details> {
                               SizedBox(
                                 height: 10,
                               ),
-                              colorCard(
-                                  'Budget',
-                                  snapshot.data.budget != 0
-                                      ? snapshot.data.budget.toString() + '\$'
-                                      : 'N/A',
-                                  context)
+                              ExpansionTile(
+                                title: Text(
+                                  'MORE INFORMATION',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 15),
+                                ),
+                                subtitle: Text(
+                                  'TAP TO EXPAND',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 10,
+                                      color: Colors.grey),
+                                ),
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Container(
+                                        width: 100,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              'Budget',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            Text(
+                                              snapshot.data.budget != 0
+                                                  ? snapshot.data.budget
+                                                          .toString() +
+                                                      '\$'
+                                                  : 'N/A',
+                                              style: info,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              'Language',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            Text(
+                                              snapshot.data.originalLanguage,
+                                              style: info,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              'Popularity',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            Text(
+                                              snapshot.data.popularity
+                                                  .toString(),
+                                              style: info,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: <Widget>[
+                                      Container(
+                                        width: 100,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              'Revenue',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            Text(
+                                              snapshot.data.revenue != 0
+                                                  ? snapshot.data.revenue
+                                                          .toString() +
+                                                      '\$'
+                                                  : 'N/A',
+                                              style: info,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              'Status',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            Text(
+                                              snapshot.data.status,
+                                              style: info,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
+                                        child: Column(
+                                          children: <Widget>[
+                                            Text(
+                                              'Vote Count',
+                                              style:
+                                                  TextStyle(color: Colors.grey),
+                                            ),
+                                            Text(
+                                              snapshot.data.voteCount
+                                                  .toString(),
+                                              style: info,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 20,
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 50,
+                              )
                             ],
                           ),
                         ),
@@ -343,111 +458,117 @@ class _DetailsState extends State<Details> {
             } else if (snapshot.hasError) {
               return Text(snapshot.error.toString());
             }
-            return Container(
-              height: _media.height,
-              width: _media.width,
-              child: Column(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: IconButton(
-                              icon: Icon(Icons.keyboard_backspace),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                        Text(
-                          'THE MOVIE DB',
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.w300),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Opacity(
-                            opacity: 0,
+            return SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              child: Container(
+                height: _media.height,
+                width: _media.width,
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
                             child: Material(
                               color: Colors.transparent,
                               child: IconButton(
-                                icon: Icon(Icons.search),
+                                icon: Icon(Icons.keyboard_backspace),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ClipPath(
-                    clipper: CustomClipPath(),
-                    child: Container(
-                      height: _media.height / 2.4,
-                      width: double.infinity,
-                      color: Colors.grey.shade200,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            SpinKitCubeGrid(
-                              color: Colors.grey.shade400,
-                            ),
-                            SizedBox(
-                              height: 20,
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Shimmer.fromColors(
-                        baseColor: Colors.grey.shade100,
-                        highlightColor: Colors.grey.shade200,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Center(
-                              child: SmoothStarRating(
-                                  allowHalfRating: true,
-                                  starCount: 5,
-                                  rating: 5,
-                                  size: 40.0,
-                                  halfFilledIconData: Icons.blur_on,
-                                  color: Colors.redAccent,
-                                  borderColor: Colors.redAccent,
-                                  spacing: 0.0),
-                            ),
-                            SizedBox(
-                              height: 50,
-                            ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: 5,
-                              itemBuilder: (BuildContext context, int index) =>
-                                  Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, bottom: 20),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: Container(
-                                    color: Colors.red,
-                                    height: 40,
-                                    width: _media.width * 0.7,
-                                  ),
+                          Text(
+                            'THE MOVIE DB',
+                            style: TextStyle(
+                                fontSize: 25, fontWeight: FontWeight.w300),
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Opacity(
+                              opacity: 0,
+                              child: Material(
+                                color: Colors.transparent,
+                                child: IconButton(
+                                  icon: Icon(Icons.search),
                                 ),
                               ),
                             ),
-                          ],
-                        )),
-                  ),
-                ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ClipPath(
+                      clipper: CustomClipPath(),
+                      child: Container(
+                        constraints: BoxConstraints(minHeight: 300),
+                        height: _media.height / 3,
+                        width: double.infinity,
+                        color: Colors.grey.shade200,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SpinKitCubeGrid(
+                                color: Colors.grey.shade400,
+                              ),
+                              SizedBox(
+                                height: 20,
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Shimmer.fromColors(
+                          baseColor: Colors.grey.shade100,
+                          highlightColor: Colors.grey.shade200,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Center(
+                                child: SmoothStarRating(
+                                    allowHalfRating: true,
+                                    starCount: 5,
+                                    rating: 5,
+                                    size: 40.0,
+                                    color: Colors.redAccent,
+                                    borderColor: Colors.redAccent,
+                                    spacing: 0.0),
+                              ),
+                              SizedBox(
+                                height: 50,
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: 5,
+                                itemBuilder:
+                                    (BuildContext context, int index) =>
+                                        Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20, bottom: 20),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Container(
+                                      color: Colors.red,
+                                      height: 40,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 50,
+                              ),
+                            ],
+                          )),
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -506,7 +627,7 @@ Widget colorCard(String text, String text2, BuildContext context) {
                 text.toUpperCase(),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 12,
+                  fontSize: 11,
                   color: Colors.white,
                 ),
               ),
@@ -517,7 +638,7 @@ Widget colorCard(String text, String text2, BuildContext context) {
                 text2,
                 style: TextStyle(
                   fontWeight: FontWeight.w300,
-                  fontSize: 16,
+                  fontSize: 14,
                   color: Colors.white,
                 ),
               ),

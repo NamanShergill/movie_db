@@ -25,6 +25,7 @@ dependencies:
   flutter_spinkit:
   shimmer:
   smooth_star_rating:
+  connectivity:
 
 
   # The following adds the Cupertino Icons font to your application.
