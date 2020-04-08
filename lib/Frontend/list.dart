@@ -230,7 +230,6 @@ class _ListPageState extends State<ListPage> {
                       child: InkWell(
                           borderRadius: BorderRadius.circular(10),
                           onTap: () {
-                            checkInternet();
                             Navigator.push(
                                 context,
                                 PageTransition(

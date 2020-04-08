@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:connectivity/connectivity.dart';
@@ -13,16 +14,6 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 
 bool internet = true;
 
-void checkInternet() async {
-  var connectivityResult = await Connectivity().checkConnectivity();
-  if (connectivityResult == ConnectivityResult.mobile ||
-      connectivityResult == ConnectivityResult.wifi) {
-    internet = true;
-  } else {
-    internet = false;
-  }
-}
-
 class Details extends StatefulWidget {
   final int index;
   final id;
@@ -32,6 +23,9 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
+  var _connectionStatus = 'Unknown';
+  Connectivity connectivity;
+  StreamSubscription<ConnectivityResult> subscription;
   Color bg = Colors.white;
   Color line = Colors.redAccent;
   static Icon add = Icon(Icons.add);
@@ -44,362 +38,284 @@ class _DetailsState extends State<Details> {
   void initState() {
     super.initState();
     bloc.fetchDetails(widget.id);
-    checkInternet();
+    connectivity = new Connectivity();
+    subscription =
+        connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
+      _connectionStatus = result.toString();
+      print(_connectionStatus);
+      if (result == ConnectivityResult.wifi ||
+          result == ConnectivityResult.mobile) {
+        setState(() {
+          internet = true;
+        });
+      } else {
+        internet = false;
+      }
+    });
+  }
+
+  Future getConn() async {
+    if (internet) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final _media = MediaQuery.of(context).size;
-    if (internet) {
-      return SafeArea(
-        top: true,
-        bottom: true,
-        child: Material(
-          child: StreamBuilder(
-            stream: bloc.detailInfo,
-            builder: (context, AsyncSnapshot<DetailModel> snapshot) {
-              if (snapshot.hasData) {
-                rating = snapshot.data.voteAverage.roundToDouble() / 2;
-                return Expanded(
-                  child: Container(
-                    child: ListView(
-                      physics: BouncingScrollPhysics(),
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: IconButton(
-                                    icon: Icon(Icons.keyboard_backspace),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                'THE MOVIE DB',
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.w300),
-                              ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Opacity(
-                                  opacity: 0,
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: IconButton(
-                                      icon: Icon(Icons.search),
+    return FutureBuilder(
+      future: getConn(),
+      builder: (context, snapshot) {
+        if (snapshot.data) {
+          return SafeArea(
+            top: true,
+            bottom: true,
+            child: Material(
+              child: StreamBuilder(
+                stream: bloc.detailInfo,
+                builder: (context, AsyncSnapshot<DetailModel> snapshot) {
+                  if (snapshot.hasData) {
+                    rating = snapshot.data.voteAverage.roundToDouble() / 2;
+                    return Expanded(
+                      child: Container(
+                        child: ListView(
+                          physics: BouncingScrollPhysics(),
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: IconButton(
+                                        icon: Icon(Icons.keyboard_backspace),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  Text(
+                                    'THE MOVIE DB',
+                                    style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.w300),
+                                  ),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(15),
+                                    child: Opacity(
+                                      opacity: 0,
+                                      child: Material(
+                                        color: Colors.transparent,
+                                        child: IconButton(
+                                          icon: Icon(Icons.search),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          constraints: BoxConstraints(minHeight: 300),
-                          height: _media.height / 3,
-                          child: Stack(
-                            children: <Widget>[
-                              ClipPath(
-                                clipper: CustomClipPath(),
-                                child: Container(
-                                  constraints: BoxConstraints(minHeight: 300),
-                                  height: _media.height / 3,
-                                  width: double.infinity,
-                                  color: Colors.grey.shade200,
-                                  child: Container(
-                                    child: Stack(
-                                      children: <Widget>[
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
+                            ),
+                            Container(
+                              constraints: BoxConstraints(minHeight: 300),
+                              height: _media.height / 3,
+                              child: Stack(
+                                children: <Widget>[
+                                  ClipPath(
+                                    clipper: CustomClipPath(),
+                                    child: Container(
+                                      constraints:
+                                          BoxConstraints(minHeight: 300),
+                                      height: _media.height / 3,
+                                      width: double.infinity,
+                                      color: Colors.grey.shade200,
+                                      child: Container(
+                                        child: Stack(
                                           children: <Widget>[
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.stretch,
+                                              children: <Widget>[
+                                                Expanded(
+                                                  child:
+                                                      FadeInImage.assetNetwork(
+                                                    fadeOutDuration: Duration(
+                                                        milliseconds: 200),
+                                                    placeholder: '',
+                                                    image:
+                                                        'https://image.tmdb.org/t/p/w185${snapshot.data.backdropPath}',
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
                                             Expanded(
-                                              child: FadeInImage.assetNetwork(
-                                                fadeOutDuration:
-                                                    Duration(milliseconds: 200),
-                                                placeholder: '',
-                                                image:
-                                                    'https://image.tmdb.org/t/p/w185${snapshot.data.backdropPath}',
-                                                fit: BoxFit.cover,
+                                              child: BackdropFilter(
+                                                filter: ImageFilter.blur(
+                                                    sigmaY: 2.5, sigmaX: 2.5),
+                                                child: Container(
+                                                  color: Colors.black54
+                                                      .withOpacity(0.1),
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
-                                        Expanded(
-                                          child: BackdropFilter(
-                                            filter: ImageFilter.blur(
-                                                sigmaY: 2.5, sigmaX: 2.5),
-                                            child: Container(
-                                              color: Colors.black54
-                                                  .withOpacity(0.1),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                              Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: <Widget>[
-                                      Row(
+                                  Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Column(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.end,
                                         children: <Widget>[
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 15),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                child: IconButton(
-                                                  icon: list,
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      print(list);
-                                                      list == add
-                                                          ? list = check
-                                                          : list = add;
-                                                      print(list);
-                                                    });
-                                                  },
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: <Widget>[
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 15),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    child: IconButton(
+                                                      icon: list,
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          print(list);
+                                                          list == add
+                                                              ? list = check
+                                                              : list = add;
+                                                          print(list);
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ),
-                                          Column(
-                                            children: <Widget>[
-                                              Material(
-                                                elevation: 10,
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                                color: Colors.transparent,
-                                                child: AnimatedContainer(
-                                                    duration: Duration(
-                                                        milliseconds: 300),
-                                                    decoration: BoxDecoration(
-                                                      color: bg,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              100),
-                                                    ),
-                                                    child: Material(
-                                                      color: Colors.transparent,
-                                                      child: InkWell(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(100),
-                                                        onTap: () {
-                                                          setState(() {
-                                                            bg == Colors.redAccent
-                                                                ? bg =
-                                                                    Colors.white
-                                                                : bg = Colors
-                                                                    .redAccent;
-                                                            line ==
-                                                                    Colors
-                                                                        .redAccent
-                                                                ? line =
-                                                                    Colors.white
-                                                                : line = Colors
-                                                                    .redAccent;
-                                                          });
-                                                        },
-                                                        child: Container(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  20),
+                                              Column(
+                                                children: <Widget>[
+                                                  Material(
+                                                    elevation: 10,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            100),
+                                                    color: Colors.transparent,
+                                                    child: AnimatedContainer(
+                                                        duration: Duration(
+                                                            milliseconds: 300),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: bg,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                        ),
+                                                        child: Material(
                                                           color: Colors
                                                               .transparent,
-                                                          child: Icon(
-                                                            Icons
-                                                                .favorite_border,
-                                                            color: line,
+                                                          child: InkWell(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        100),
+                                                            onTap: () {
+                                                              setState(() {
+                                                                bg == Colors.redAccent
+                                                                    ? bg = Colors
+                                                                        .white
+                                                                    : bg = Colors
+                                                                        .redAccent;
+                                                                line ==
+                                                                        Colors
+                                                                            .redAccent
+                                                                    ? line =
+                                                                        Colors
+                                                                            .white
+                                                                    : line = Colors
+                                                                        .redAccent;
+                                                              });
+                                                            },
+                                                            child: Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(20),
+                                                              color: Colors
+                                                                  .transparent,
+                                                              child: Icon(
+                                                                Icons
+                                                                    .favorite_border,
+                                                                color: line,
+                                                              ),
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ),
-                                                    )),
+                                                        )),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 20,
+                                                  ),
+                                                ],
                                               ),
-                                              SizedBox(
-                                                height: 20,
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 15),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(15),
-                                              child: Material(
-                                                color: Colors.transparent,
-                                                child: IconButton(
-                                                  icon: Icon(Icons.share),
-                                                  onPressed: () {},
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 15),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.circular(15),
+                                                  child: Material(
+                                                    color: Colors.transparent,
+                                                    child: IconButton(
+                                                      icon: Icon(Icons.share),
+                                                      onPressed: () {},
+                                                    ),
+                                                  ),
                                                 ),
                                               ),
-                                            ),
+                                            ],
                                           ),
                                         ],
-                                      ),
-                                    ],
-                                  )),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          child: Container(
-                            width: double.infinity,
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  snapshot.data.title.toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(
-                                  height: 7,
-                                ),
-                                Center(
-                                  child: SmoothStarRating(
-                                      allowHalfRating: true,
-                                      starCount: 5,
-                                      rating: rating,
-                                      size: 30,
-                                      halfFilledIconData: Icons.blur_on,
-                                      color: Colors.redAccent,
-                                      borderColor: Colors.redAccent,
-                                      spacing: 0.0),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
+                                      )),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 20, right: 20),
+                              child: Container(
+                                width: double.infinity,
+                                child: Column(
                                   children: <Widget>[
-                                    colorCard(
-                                        'Year',
-                                        snapshot.data.releaseDate.year
-                                            .toString(),
-                                        context),
-                                    colorCard(
-                                        'Adult',
-                                        snapshot.data.adult
-                                            .toString()
-                                            .toUpperCase(),
-                                        context),
-                                    colorCard(
-                                        'Runtime',
-                                        snapshot.data.runtime.toString() +
-                                            ' Min',
-                                        context),
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    snapshot.data.overview,
-                                    textAlign: TextAlign.justify,
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 17),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                ExpansionTile(
-                                  title: Text(
-                                    'MORE INFORMATION',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w300,
-                                        fontSize: 15),
-                                  ),
-                                  subtitle: Text(
-                                    'TAP TO EXPAND',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 10,
-                                        color: Colors.grey),
-                                  ),
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      children: <Widget>[
-                                        Container(
-                                          width: 100,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Text(
-                                                'Budget',
-                                                style: TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Text(
-                                                snapshot.data.budget != 0
-                                                    ? snapshot.data.budget
-                                                            .toString() +
-                                                        '\$'
-                                                    : 'N/A',
-                                                style: info,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 100,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Text(
-                                                'Language',
-                                                style: TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Text(
-                                                snapshot.data.originalLanguage,
-                                                style: info,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 100,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Text(
-                                                'Popularity',
-                                                style: TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Text(
-                                                snapshot.data.popularity
-                                                    .toString(),
-                                                style: info,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
+                                    Text(
+                                      snapshot.data.title.toUpperCase(),
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      height: 3,
+                                    ),
+                                    Center(
+                                      child: SmoothStarRating(
+                                          allowHalfRating: true,
+                                          starCount: 5,
+                                          rating: rating,
+                                          size: 30,
+                                          halfFilledIconData: Icons.blur_on,
+                                          color: Colors.redAccent,
+                                          borderColor: Colors.redAccent,
+                                          spacing: 0.0),
                                     ),
                                     SizedBox(
                                       height: 20,
@@ -408,86 +324,326 @@ class _DetailsState extends State<Details> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
                                       children: <Widget>[
-                                        Container(
-                                          width: 100,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Text(
-                                                'Revenue',
-                                                style: TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Text(
-                                                snapshot.data.revenue != 0
-                                                    ? snapshot.data.revenue
-                                                            .toString() +
-                                                        '\$'
-                                                    : 'N/A',
-                                                style: info,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 100,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Text(
-                                                'Status',
-                                                style: TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Text(
-                                                snapshot.data.status,
-                                                style: info,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          width: 100,
-                                          child: Column(
-                                            children: <Widget>[
-                                              Text(
-                                                'Vote Count',
-                                                style: TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Text(
-                                                snapshot.data.voteCount
-                                                    .toString(),
-                                                style: info,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
+                                        colorCard(
+                                            'Year',
+                                            snapshot.data.releaseDate.year
+                                                .toString(),
+                                            context),
+                                        colorCard(
+                                            'Adult',
+                                            snapshot.data.adult
+                                                .toString()
+                                                .toUpperCase(),
+                                            context),
+                                        colorCard(
+                                            'Runtime',
+                                            snapshot.data.runtime.toString() +
+                                                ' Min',
+                                            context),
                                       ],
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text(
+                                        snapshot.data.overview,
+                                        textAlign: TextAlign.justify,
+                                        style: TextStyle(
+                                            color: Colors.grey, fontSize: 17),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    ExpansionTile(
+                                      title: Text(
+                                        'MORE INFORMATION',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w300,
+                                            fontSize: 15),
+                                      ),
+                                      subtitle: Text(
+                                        'TAP TO EXPAND',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 10,
+                                            color: Colors.grey),
+                                      ),
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            Container(
+                                              width: 100,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Budget',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  Text(
+                                                    snapshot.data.budget != 0
+                                                        ? snapshot.data.budget
+                                                                .toString() +
+                                                            '\$'
+                                                        : 'N/A',
+                                                    style: info,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 100,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Language',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  Text(
+                                                    snapshot
+                                                        .data.originalLanguage,
+                                                    style: info,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 100,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Popularity',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  Text(
+                                                    snapshot.data.popularity
+                                                        .toString(),
+                                                    style: info,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            Container(
+                                              width: 100,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Revenue',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  Text(
+                                                    snapshot.data.revenue != 0
+                                                        ? snapshot.data.revenue
+                                                                .toString() +
+                                                            '\$'
+                                                        : 'N/A',
+                                                    style: info,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 100,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Status',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  Text(
+                                                    snapshot.data.status,
+                                                    style: info,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 100,
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Text(
+                                                    'Vote Count',
+                                                    style: TextStyle(
+                                                        color: Colors.grey),
+                                                  ),
+                                                  Text(
+                                                    snapshot.data.voteCount
+                                                        .toString(),
+                                                    style: info,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        )
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text(snapshot.error.toString());
+                  }
+                  return SingleChildScrollView(
+                    physics: BouncingScrollPhysics(),
+                    child: Container(
+                      height: _media.height,
+                      width: _media.width,
+                      child: Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Material(
+                                    color: Colors.transparent,
+                                    child: IconButton(
+                                      icon: Icon(Icons.keyboard_backspace),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  'THE MOVIE DB',
+                                  style: TextStyle(
+                                      fontSize: 25,
+                                      fontWeight: FontWeight.w300),
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(15),
+                                  child: Opacity(
+                                    opacity: 0,
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: IconButton(
+                                        icon: Icon(Icons.search),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ClipPath(
+                            clipper: CustomClipPath(),
+                            child: Container(
+                              constraints: BoxConstraints(minHeight: 300),
+                              height: _media.height / 3,
+                              width: double.infinity,
+                              color: Colors.grey.shade200,
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    SpinKitCubeGrid(
+                                      color: Colors.grey.shade400,
                                     ),
                                     SizedBox(
                                       height: 20,
                                     )
                                   ],
                                 ),
-                                SizedBox(
-                                  height: 50,
-                                )
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          Expanded(
+                            child: Shimmer.fromColors(
+                                baseColor: Colors.grey.shade100,
+                                highlightColor: Colors.grey.shade200,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Center(
+                                      child: SmoothStarRating(
+                                          allowHalfRating: true,
+                                          starCount: 5,
+                                          rating: 5,
+                                          size: 40.0,
+                                          color: Colors.redAccent,
+                                          borderColor: Colors.redAccent,
+                                          spacing: 0.0),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                    ),
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: 5,
+                                      itemBuilder:
+                                          (BuildContext context, int index) =>
+                                              Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 20, right: 20, bottom: 20),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: Container(
+                                            color: Colors.red,
+                                            height: 40,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text(snapshot.error.toString());
-              }
-              return SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Container(
-                  height: _media.height,
-                  width: _media.width,
+                  );
+                },
+              ),
+            ),
+          );
+        } else {
+          return SafeArea(
+            top: true,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                color: Colors.grey.shade50,
+                height: _media.height,
+                width: _media.width,
+                child: Center(
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.all(10.0),
@@ -526,163 +682,42 @@ class _DetailsState extends State<Details> {
                           ],
                         ),
                       ),
-                      ClipPath(
-                        clipper: CustomClipPath(),
-                        child: Container(
-                          constraints: BoxConstraints(minHeight: 300),
-                          height: _media.height / 3,
-                          width: double.infinity,
-                          color: Colors.grey.shade200,
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                SpinKitCubeGrid(
-                                  color: Colors.grey.shade400,
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                )
-                              ],
-                            ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.only(left: 50),
+                            child: Container(
+                                height: 400,
+                                width: 400,
+                                child: FlareActor(
+                                  "assets/flare/internet.flr",
+                                  alignment: Alignment.center,
+                                  fit: BoxFit.contain,
+                                  animation: "init",
+                                )),
                           ),
-                        ),
+                          Text(
+                            "NO INTERNET CONNECTION",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w300),
+                          )
+                        ],
                       ),
-                      Expanded(
-                        child: Shimmer.fromColors(
-                            baseColor: Colors.grey.shade100,
-                            highlightColor: Colors.grey.shade200,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Center(
-                                  child: SmoothStarRating(
-                                      allowHalfRating: true,
-                                      starCount: 5,
-                                      rating: 5,
-                                      size: 40.0,
-                                      color: Colors.redAccent,
-                                      borderColor: Colors.redAccent,
-                                      spacing: 0.0),
-                                ),
-                                SizedBox(
-                                  height: 50,
-                                ),
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: 5,
-                                  itemBuilder:
-                                      (BuildContext context, int index) =>
-                                          Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20, right: 20, bottom: 20),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(15),
-                                      child: Container(
-                                        color: Colors.red,
-                                        height: 40,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 50,
-                                ),
-                              ],
-                            )),
+                      SizedBox(
+                        height: 50,
                       ),
                     ],
                   ),
                 ),
-              );
-            },
-          ),
-        ),
-      );
-    } else {
-      return SafeArea(
-        top: true,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            color: Colors.grey.shade50,
-            height: _media.height,
-            width: _media.width,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: IconButton(
-                              icon: Icon(Icons.keyboard_backspace),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ),
-                        ),
-                        Text(
-                          'THE MOVIE DB',
-                          style: TextStyle(
-                              fontSize: 25, fontWeight: FontWeight.w300),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: Opacity(
-                            opacity: 0,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: IconButton(
-                                icon: Icon(Icons.search),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.only(left: 50),
-                        child: Container(
-                            height: 400,
-                            width: 400,
-                            child: FlareActor(
-                              "assets/flare/internet.flr",
-                              alignment: Alignment.center,
-                              fit: BoxFit.contain,
-                              animation: "init",
-                            )),
-                      ),
-                      Text(
-                        "NO INTERNET CONNECTION",
-                        style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w300),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 50,
-                  ),
-                ],
               ),
             ),
-          ),
-        ),
-      );
-    }
+          );
+        }
+      },
+    );
   }
 }
 
