@@ -228,21 +228,17 @@ class _ListPageState extends State<ListPage> {
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
-                          borderRadius: BorderRadius.circular(10),
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                PageTransition(
-                                  type: PageTransitionType.rightToLeft,
-                                  child: Details(
-                                      index, snapshot.data.results[index].id),
-                                ));
-                          },
-                          child: Expanded(
-                            child: Container(
-                              color: Colors.transparent,
-                            ),
-                          )),
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                child: Details(
+                                    index, snapshot.data.results[index].id),
+                              ));
+                        },
+                      ),
                     ),
                   ],
                 ),
