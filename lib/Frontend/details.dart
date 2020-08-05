@@ -351,13 +351,13 @@ class _DetailsState extends State<Details> {
                                   ),
                                   ExpansionTile(
                                     title: Text(
-                                      'MORE INFORMATION',
+                                      'MORE INFORMATION\n',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w300,
                                           fontSize: 15),
                                     ),
                                     subtitle: Text(
-                                      'TAP TO EXPAND',
+                                      'TAP TO EXPAND\n+',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w400,
                                           fontSize: 10,
