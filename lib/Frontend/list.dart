@@ -98,7 +98,7 @@ class _ListPageState extends State<ListPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 20),
                               child: Text(
-                                'Search would @@ -228,21 +228,17 @@ be enabled soon',
+                                'Search would \n@@ -228,21 +228,17 @@ be enabled soon',
                                 style: TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.w300),
