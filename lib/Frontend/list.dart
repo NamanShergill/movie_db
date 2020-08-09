@@ -19,7 +19,7 @@ class _ListPageState extends State<ListPage> {
   }
 
   double height = 0;
-  String test = " @@ -228,21 +228,17 @@ ";
+  String test = " @@ -228,21 +229,17 @@ ";
   double iconSize = 0;
 
   @override
@@ -98,7 +98,7 @@ class _ListPageState extends State<ListPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 20),
                               child: Text(
-                                'Search would \n@@ -228,21 +228,17 @@ be enabled soon',
+                                'Search would \n@@ -245,21 +228,17 @@ be enabled soon',
                                 style: TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.w300),
