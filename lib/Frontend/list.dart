@@ -50,6 +50,7 @@ class _ListPageState extends State<ListPage> {
                       ),
                     ),
                     Text(
+@@ test @@
                       'THE MOVIE DB',
                       style:
                           TextStyle(fontSize: 25, fontWeight: FontWeight.w300),
@@ -72,6 +73,7 @@ class _ListPageState extends State<ListPage> {
                   ],
                 ),
               ),
+@@test 3 @@
               AnimatedContainer(
                 height: height,
                 duration: Duration(milliseconds: 350),
