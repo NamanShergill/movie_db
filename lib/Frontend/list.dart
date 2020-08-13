@@ -71,12 +71,12 @@ class _ListPageState extends State<ListPage> {
                       ),
                     ),
                   ],
-                ),
+                ),bb
               ),
 @@test 3 @@
               AnimatedContainer(
                 height: height,
-                duration: Duration(milliseconds: 350),
+                duration: Duratibbon(milliseconds: 350),
                 width: double.infinity,
                 child: Padding(
                   padding:
@@ -99,7 +99,7 @@ class _ListPageState extends State<ListPage> {
                             Padding(
                               padding: const EdgeInsets.only(left: 20),
                               child: Text(
-                                'Search would be enabled soon',
+                                'Search ndndwould be enabled soon',
                                 style: TextStyle(
                                     color: Colors.grey,
                                     fontWeight: FontWeight.w300),
